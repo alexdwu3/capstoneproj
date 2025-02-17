@@ -1,0 +1,4 @@
+2025-01-12 18:41:15.655 EST [18893] FATAL:  lock file "postmaster.pid" already exists
+2025-01-12 18:41:15.655 EST [18893] HINT:  Is another postmaster (PID 18883) running in data directory "/Users/alex/postgres_data"?
+2025-01-12 18:41:17.241 EST [18911] FATAL:  lock file "postmaster.pid" already exists
+2025-01-12 18:41:17.241 EST [18911] HINT:  Is another postmaster (PID 18883) running in data directory "/Users/alex/postgres_data"?
