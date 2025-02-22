@@ -18,9 +18,12 @@ def setup_db(app):
 
     app.config["SQLALCHEMY_DATABASE_URI"] = database_path
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    
-    db.app = app
-    db.init_app(app)
+
+    # ✅ Prevent multiple `db.init_app(app)` calls
+    if not hasattr(app, 'extensions') or 'sqlalchemy' not in app.extensions:
+        db.init_app(app)    
+    # db.app = app
+    # db.init_app(app)
 
 class Movie(db.Model):
     """Movie Model representing movies in the casting agency"""

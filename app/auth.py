@@ -111,6 +111,7 @@ def check_permissions(permission, payload):
     return True
 
 def verify_decode_jwt(token):
+    
     """Verifies and decodes the JWT using Auth0"""
     print("🔍 Fetching JWKS keys from Auth0...")  # Debugging
 
