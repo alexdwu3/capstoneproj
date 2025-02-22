@@ -3,6 +3,7 @@ from flask import Flask, request, abort, jsonify
 from flask_cors import CORS
 from app.models import setup_db, Actor, Movie, db
 from app.auth import AuthError, requires_auth
+from datetime import datetime
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -36,14 +37,21 @@ def create_app(test_config=None):
     @app.route('/movies', methods=['GET'])
     @requires_auth('get:movies')
     def get_movies(payload):
+        print("✅ Entered get_movies() route")  # Debugging
+
         try:
             movies = Movie.query.all()
+            print(f"🔍 Retrieved {len(movies)} movies from database")
+
             return jsonify({
                 'success': True,
                 'movies': [movie.format() for movie in movies]
             }), 200
+
         except Exception as e:
             abort(500)
+        
+
 
     @app.route('/actors', methods=['POST'])
     @requires_auth('post:actors')
@@ -88,7 +96,9 @@ def create_app(test_config=None):
                 'created': movie.id
             }), 201
         except Exception as e:
+            print(f"Database error: {e}")  # Debugging print
             abort(422)
+
 
     @app.route('/actors/<int:actor_id>', methods=['PATCH'])
     @requires_auth('patch:actors')
@@ -122,23 +132,30 @@ def create_app(test_config=None):
         movie = Movie.query.get(movie_id)
         if not movie:
             abort(404)
-            
+
         body = request.get_json()
         
         try:
+            # Ensure the movie object is attached to the session
+            movie = db.session.merge(movie)  
+            
             if 'title' in body:
                 movie.title = body['title']
             if 'release_date' in body:
                 movie.release_date = datetime.fromisoformat(body['release_date'])
-                
-            movie.update()
+
+            db.session.commit()  # Explicitly commit changes
             
             return jsonify({
                 'success': True,
                 'movie': movie.format()
             }), 200
         except Exception as e:
+            print(f"🚨 Error updating movie: {str(e)}")  # Debugging
+            db.session.rollback()  # Ensure rollback on failure
             abort(422)
+
+
 
     @app.route('/actors/<int:actor_id>', methods=['DELETE'])
     @requires_auth('delete:actors')
