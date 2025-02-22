@@ -1,4 +1,3 @@
-# app.py
 from flask import Flask, request, abort, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy  # Import SQLAlchemy
@@ -16,7 +15,8 @@ def create_app(test_config=None):
     app.config.from_object('config.Config')
 
     setup_db(app)
-    migrate.init_app(app, db)  # Initialize Flask-Migrate
+    db.init_app(app)  # Initialize SQLAlchemy with the app
+    migrate.init_app(app, db)  # Initialize Flask-Migrate with the app and db
 
     CORS(app)
 
@@ -24,7 +24,6 @@ def create_app(test_config=None):
     def log_request():
         print(f"🔍 Received request: {request.method} {request.path}")
         print(f"🔍 Headers: {request.headers}")
-
 
     @app.after_request
     def after_request(response):
@@ -60,8 +59,6 @@ def create_app(test_config=None):
 
         except Exception as e:
             abort(500)
-        
-
 
     @app.route('/actors', methods=['POST'])
     @requires_auth('post:actors')
@@ -108,7 +105,6 @@ def create_app(test_config=None):
         except Exception as e:
             print(f"Database error: {e}")  # Debugging print
             abort(422)
-
 
     @app.route('/actors/<int:actor_id>', methods=['PATCH'])
     @requires_auth('patch:actors')
@@ -164,8 +160,6 @@ def create_app(test_config=None):
             print(f"🚨 Error updating movie: {str(e)}")  # Debugging
             db.session.rollback()  # Ensure rollback on failure
             abort(422)
-
-
 
     @app.route('/actors/<int:actor_id>', methods=['DELETE'])
     @requires_auth('delete:actors')
