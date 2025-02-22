@@ -123,7 +123,8 @@ def create_app(test_config=None):
                 actor.gender = body['gender']
             
             print(f"Updating actor: {actor}")  # Debugging
-            actor.update()
+            db.session.add(actor)  # Ensure the actor object is attached to the session
+            db.session.commit()  # Explicitly commit changes
             print(f"Actor updated: {actor}")  # Debugging
             
             formatted_actor = actor.format()
@@ -135,6 +136,7 @@ def create_app(test_config=None):
             }), 200
         except Exception as e:
             print(f"🚨 Error updating actor: {str(e)}")  # Debugging
+            db.session.rollback()  # Ensure rollback on failure
             abort(422)
 
     @app.route('/movies/<int:movie_id>', methods=['PATCH'])
