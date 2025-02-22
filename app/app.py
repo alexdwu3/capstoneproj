@@ -121,14 +121,20 @@ def create_app(test_config=None):
                 actor.age = body['age']
             if 'gender' in body:
                 actor.gender = body['gender']
-                
+            
+            print(f"Updating actor: {actor}")  # Debugging
             actor.update()
+            print(f"Actor updated: {actor}")  # Debugging
+            
+            formatted_actor = actor.format()
+            print(f"Formatted actor: {formatted_actor}")  # Debugging
             
             return jsonify({
                 'success': True,
-                'actor': actor.format()
+                'actor': formatted_actor
             }), 200
         except Exception as e:
+            print(f"🚨 Error updating actor: {str(e)}")  # Debugging
             abort(422)
 
     @app.route('/movies/<int:movie_id>', methods=['PATCH'])
