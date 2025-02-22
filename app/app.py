@@ -1,13 +1,13 @@
 from flask import Flask, request, abort, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy  # Import SQLAlchemy
-from app.models import setup_db, Actor, Movie, db
+from flask_migrate import Migrate  # Import Flask-Migrate
+from app.models import setup_db, Actor, Movie
 from app.auth import AuthError, requires_auth
 from datetime import datetime
-from flask_migrate import Migrate  # Import Flask-Migrate
 
-db = SQLAlchemy()
-migrate = Migrate()
+db = SQLAlchemy()  # Ensure this exists globally
+migrate = Migrate()  # Ensure this is initialized
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -15,7 +15,6 @@ def create_app(test_config=None):
     app.config.from_object('config.Config')
 
     setup_db(app)
-    db.init_app(app)  # Initialize SQLAlchemy with the app
     migrate.init_app(app, db)  # Initialize Flask-Migrate with the app and db
 
     CORS(app)
