@@ -1,13 +1,23 @@
 # app.py
 from flask import Flask, request, abort, jsonify
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy  # Import SQLAlchemy
 from app.models import setup_db, Actor, Movie, db
 from app.auth import AuthError, requires_auth
 from datetime import datetime
+from flask_migrate import Migrate  # Import Flask-Migrate
+
+db = SQLAlchemy()
+migrate = Migrate()
 
 def create_app(test_config=None):
     app = Flask(__name__)
+    
+    app.config.from_object('config.Config')
+
     setup_db(app)
+    migrate.init_app(app, db)  # Initialize Flask-Migrate
+
     CORS(app)
 
     @app.before_request

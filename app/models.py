@@ -2,13 +2,23 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import json
+import os
 
 db = SQLAlchemy()
 
 def setup_db(app):
-    """Binds a flask application and a SQLAlchemy service"""
-    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://localhost:5432/castingagency"
+    """Binds a Flask application and a SQLAlchemy service"""
+    
+    # Fetch database URL from environment variable (use Heroku DB when deployed)
+    database_path = os.getenv('DATABASE_URL', 'postgresql://localhost:5432/castingagency')
+    
+    # Heroku may prepend "postgres://" instead of "postgresql://"
+    if database_path.startswith("postgres://"):
+        database_path = database_path.replace("postgres://", "postgresql://", 1)
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_path
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    
     db.app = app
     db.init_app(app)
 
